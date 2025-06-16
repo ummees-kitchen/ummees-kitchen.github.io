@@ -7,6 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Added Tailwind CSS for new components -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         :root {
             --primary-color: #0275d8;
@@ -28,19 +30,22 @@
         }
 
         .container {
-            display: flex;
-            flex-wrap: wrap;
+            /* Changed to grid for 3 columns */
+            display: grid;
+            grid-template-columns: minmax(400px, 1fr) 2fr minmax(350px, 1fr);
             gap: 20px;
-            max-width: 1400px;
+            max-width: 1800px;
             margin: 0 auto;
         }
 
-        .item-selector, .bill-preview-container {
+        .item-selector, .bill-preview-container, .bill-history-container {
             background: #fff;
             border-radius: 8px;
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .item-selector { flex: 1; min-width: 400px; }
@@ -127,22 +132,55 @@
         #bill-table tfoot td { font-weight: bold; font-size: 1.2em; text-align: right; }
         #bill-footer { display: none; margin-top: 40px; text-align: center; font-size: 1em; font-style: italic; }
 
+        /* History List Styles */
+        .history-list-item {
+            padding: 8px 12px; margin-bottom: 5px; border: 1px solid var(--border-color);
+            border-radius: 5px; cursor: pointer; transition: background-color 0.2s, border-color 0.2s;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .history-list-item:hover { background-color: #f0f4f8; border-color: var(--primary-color); }
+        details { margin-bottom: 10px; border-left: 2px solid var(--border-color); padding-left: 15px; }
+        summary { font-weight: bold; cursor: pointer; padding: 5px; }
+
+        /* Modal for Report */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5); display: none; justify-content: center;
+            align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: white; padding: 30px; border-radius: 8px; width: 90%;
+            max-width: 900px; max-height: 90vh; overflow-y: auto;
+        }
+
         /* Print Styles */
         @media print {
             body { padding: 0; margin: 0; font-size: 12pt; color: #000; background: #fff; }
-            .item-selector, .bill-preview-container h2, .controls, .edit-controls, .delete-btn, #print-button-container {
+            .item-selector, .bill-preview-container h2, .controls, .edit-controls, .delete-btn, #print-button-container, .bill-history-container, .modal-overlay {
                 display: none;
             }
             .container, .bill-preview-container { width: 100%; margin: 0; padding: 0; box-shadow: none; }
+            #printable-bill { display: block; }
             .bill-header { display: block; }
             #bill-table { width: 100%; }
             #bill-table th, #bill-table td { border-bottom: 1px solid #ccc; padding: 8px 4px; }
-            #bill-table td:last-child { border-bottom: 1px solid #ccc; } /* Ensure last row has border */
-            .details-input {
-                border: none; background: transparent; width: 100%; font-size: 12pt;
-                font-family: 'Noto Sans Malayalam', sans-serif;
-            }
+            #bill-table td:last-child { border-bottom: 1px solid #ccc; }
+            .details-input { border: none; background: transparent; width: 100%; font-size: 12pt; font-family: 'Noto Sans Malayalam', sans-serif; }
             #bill-footer { display: block; }
+            
+            /* Styles for Report Printing */
+            body.printing-report .container, body.printing-report #printable-bill { display: none; }
+            body.printing-report .modal-overlay { display: block !important; position: static; background: none; }
+            body.printing-report .modal-content {
+                box-shadow: none; border: none; width: 100%; max-width: 100%;
+                padding: 0; max-height: none; overflow: visible;
+            }
+            body.printing-report .modal-content > div:not(#report-output),
+            body.printing-report #report-print-button-container,
+            body.printing-report .modal-content > hr {
+                display: none;
+            }
+            body.printing-report #report-output { display: block; }
         }
     </style>
 </head>
@@ -154,9 +192,7 @@
                 <button onclick="toggleEditMode()" id="edit-mode-btn" class="edit-btn">Edit Master List</button>
                 <button onclick="resetMasterListToDefaults()" class="secondary-btn">Reset to Defaults</button>
             </div>
-            <div id="item-categories">
-                <!-- Categories will be populated by JavaScript -->
-            </div>
+            <div id="item-categories"></div>
              <div class="edit-controls">
                  <button onclick="addNewCategory()" class="add-item-btn" style="width:100%; margin-top: 20px;">+ Add New Category</button>
             </div>
@@ -188,11 +224,7 @@
                     <thead><tr><th>No.</th><th>Item</th><th>Qty</th><th>Rate</th><th>Amount</th><th></th></tr></thead>
                     <tbody></tbody>
                     <tfoot>
-                        <tr>
-                            <td colspan="4">Total Amount</td>
-                            <td id="total-amount">0.00</td>
-                            <td></td>
-                        </tr>
+                        <tr><td colspan="4">Total Amount</td><td id="total-amount">0.00</td><td></td></tr>
                     </tfoot>
                 </table>
                 <div id="bill-footer"><p>Thank you for your business!</p></div>
@@ -201,102 +233,102 @@
                 <button class="print-btn" onclick="generateAndPrintBill()">Generate & Print Bill</button>
             </div>
         </div>
+        
+        <div class="bill-history-container">
+            <h2>Bill History</h2>
+            <div class="history-controls mb-4">
+                 <button onclick="showReportModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                    Generate Monthly Report
+                </button>
+            </div>
+            <div id="history-list">
+                <!-- History will be populated by JS -->
+            </div>
+        </div>
     </div>
+
+    <!-- Report Modal -->
+    <div id="report-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold text-gray-700">Generate Monthly Report</h3>
+                <button onclick="hideReportModal()" class="text-3xl font-bold text-gray-500 hover:text-gray-800">×</button>
+            </div>
+            <div class="flex flex-wrap gap-4 mb-4 items-center">
+                <select id="report-year-select" class="p-2 border rounded w-full md:w-auto flex-grow"></select>
+                <select id="report-month-select" class="p-2 border rounded w-full md:w-auto flex-grow"></select>
+                <button onclick="generateAndDisplayReport()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full md:w-auto">Generate</button>
+            </div>
+            <hr class="my-4"/>
+            <div id="report-output">
+                <p class="text-gray-500">Select a year and month to generate a report.</p>
+            </div>
+             <div id="report-print-button-container" class="mt-6 text-right" style="display: none;">
+                <button onclick="printReport()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded text-lg">Print Report</button>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         // --- DATA ---
         let masterItemData = {};
-        // New structure: { "Category": [{ name: "ItemName", rate: 100 }, ...] }
         const defaultItemData = {
-            "ഇറച്ചി": [
-                { name: "ചിക്കൻ കറി", rate: 160 }, { name: "ബീഫ് കറി", rate: 180 },
-                { name: "മട്ടൻ കറി", rate: 220 }, { name: "ചിക്കൻ ഫ്രൈ", rate: 170 },
-                { name: "ബീഫ് ഫ്രൈ", rate: 190 }, { name: "ചിക്കൻ ബിരിയാണി", rate: 140 },
-                { name: "ബീഫ് ബിരിയാണി", rate: 160 }, { name: "മട്ടൻ ബിരിയാണി", rate: 200 }
-            ],
-            "മീൻ": [
-                { name: "മീൻ കറി", rate: 120 }, { name: "മീൻ ഫ്രൈ", rate: 100 },
-                { name: "ചെമ്മീൻ റോസ്റ്റ്", rate: 250 }, { name: "കൂന്തൽ ഫ്രൈ", rate: 200 }
-            ],
-            "പച്ചക്കറി": [
-                { name: "പരിപ്പ് കറി", rate: 60 }, { name: "സാമ്പാർ", rate: 70 },
-                { name: "അവിയൽ", rate: 80 }, { name: "തോരൻ", rate: 50 }
-            ],
-            "അരി ആഹാരം": [
-                { name: "ചോറ്", rate: 40 }, { name: "നെയ്ച്ചോറ്", rate: 70 },
-                { name: "പൊറോട്ട", rate: 12 }, { name: "ചപ്പാത്തി", rate: 10 },
-                { name: "അപ്പം", rate: 10 }, { name: "ഇടിയപ്പം", rate: 10 }
-            ],
-            "മറ്റുള്ളവ": [
-                { name: "സാലഡ്", rate: 30 }, { name: "പപ്പടം", rate: 5 },
-                { name: "അച്ചാർ", rate: 10 }, { name: "തൈര്", rate: 20 }
-            ]
+            "ഇറച്ചി": [ { name: "ചിക്കൻ കറി", rate: 160 }, { name: "ബീഫ് കറി", rate: 180 }, { name: "മട്ടൻ കറി", rate: 220 }, { name: "ചിക്കൻ ഫ്രൈ", rate: 170 }, { name: "ബീഫ് ഫ്രൈ", rate: 190 }, { name: "ചിക്കൻ ബിരിയാണി", rate: 140 }, { name: "ബീഫ് ബിരിയാണി", rate: 160 }, { name: "മട്ടൻ ബിരിയാണി", rate: 200 } ],
+            "മീൻ": [ { name: "മീൻ കറി", rate: 120 }, { name: "മീൻ ഫ്രൈ", rate: 100 }, { name: "ചെമ്മീൻ റോസ്റ്റ്", rate: 250 }, { name: "കൂന്തൽ ഫ്രൈ", rate: 200 } ],
+            "പച്ചക്കറി": [ { name: "പരിപ്പ് കറി", rate: 60 }, { name: "സാമ്പാർ", rate: 70 }, { name: "അവിയൽ", rate: 80 }, { name: "തോരൻ", rate: 50 } ],
+            "അരി ആഹാരം": [ { name: "ചോറ്", rate: 40 }, { name: "നെയ്ച്ചോറ്", rate: 70 }, { name: "പൊറോട്ട", rate: 12 }, { name: "ചപ്പാത്തി", rate: 10 }, { name: "അപ്പം", rate: 10 }, { name: "ഇടിയപ്പം", rate: 10 } ],
+            "മറ്റുള്ളവ": [ { name: "സാലഡ്", rate: 30 }, { name: "പപ്പടം", rate: 5 }, { name: "അച്ചാർ", rate: 10 }, { name: "തൈര്", rate: 20 } ]
         };
         const MASTER_LIST_KEY = 'ummeesBillingMasterData';
         const CURRENT_BILL_ITEMS_KEY = 'ummeesCurrentBillItems';
         const CURRENT_BILL_TO_KEY = 'ummeesCurrentBillTo';
         const BILL_COUNTER_KEY = 'ummeesBillCounter';
+        const BILL_HISTORY_KEY = 'ummeesBillHistory';
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
 
         // --- MASTER LIST MANAGEMENT (LEFT SIDE) ---
-
         function initializeMasterList() {
             const savedData = localStorage.getItem(MASTER_LIST_KEY);
-            if (savedData) {
-                masterItemData = JSON.parse(savedData);
-            } else {
-                masterItemData = JSON.parse(JSON.stringify(defaultItemData)); // Deep copy
-                saveMasterList();
-            }
+            masterItemData = savedData ? JSON.parse(savedData) : JSON.parse(JSON.stringify(defaultItemData));
+            if (!savedData) saveMasterList();
             renderMasterList();
         }
 
-        function saveMasterList() {
-            localStorage.setItem(MASTER_LIST_KEY, JSON.stringify(masterItemData));
-        }
+        function saveMasterList() { localStorage.setItem(MASTER_LIST_KEY, JSON.stringify(masterItemData)); }
 
         function renderMasterList() {
             const container = document.getElementById('item-categories');
             container.innerHTML = '';
-            
             for (const category in masterItemData) {
                 const fieldset = document.createElement('fieldset');
                 fieldset.className = 'category-group';
-                
-                const legend = document.createElement('legend');
-                legend.textContent = category;
-                
                 const catHeader = document.createElement('div');
                 catHeader.className = 'category-header';
-                catHeader.appendChild(legend);
-
-                const catControls = document.createElement('div');
-                catControls.innerHTML = `
-                    <span class="edit-icon" onclick="editCategory('${category}')">rename</span>
-                    <span class="edit-icon" onclick="deleteCategory('${category}')" style="color:var(--danger-color);">delete</span>`;
-                catHeader.appendChild(catControls);
+                catHeader.innerHTML = `<legend>${category}</legend>
+                    <div>
+                        <span class="edit-icon" onclick="editCategory('${category}')">rename</span>
+                        <span class="edit-icon" onclick="deleteCategory('${category}')" style="color:var(--danger-color);">delete</span>
+                    </div>`;
                 fieldset.appendChild(catHeader);
-
                 const ul = document.createElement('ul');
                 ul.className = 'item-list';
-
                 masterItemData[category].forEach((item, index) => {
                     const li = document.createElement('li');
                     li.onclick = () => addItemToBill(item);
-                    li.innerHTML = `
-                        <label>${item.name}</label>
+                    li.innerHTML = `<label>${item.name}</label>
                         <span class="item-rate">₹${item.rate}</span>
                         <span class="edit-icon" onclick="event.stopPropagation(); editItem('${category}', ${index})">edit</span>
                         <span class="edit-icon" onclick="event.stopPropagation(); deleteItem('${category}', ${index})" style="color:var(--danger-color);">×</span>`;
                     ul.appendChild(li);
                 });
-
                 fieldset.appendChild(ul);
                 const addItemBtn = document.createElement('button');
                 addItemBtn.className = 'add-item-btn secondary-btn';
                 addItemBtn.textContent = '+ Add Item';
                 addItemBtn.onclick = () => addNewItem(category);
                 fieldset.appendChild(addItemBtn);
-
                 container.appendChild(fieldset);
             }
         }
@@ -328,9 +360,8 @@
             const newName = prompt(`Rename category "${oldName}" to:`, oldName);
             if (newName && newName.trim() && newName.trim() !== oldName) {
                 if (masterItemData[newName.trim()]) { alert("A category with this name already exists."); return; }
-                const data = masterItemData[oldName];
+                masterItemData[newName.trim()] = masterItemData[oldName];
                 delete masterItemData[oldName];
-                masterItemData[newName.trim()] = data;
                 saveMasterList(); renderMasterList();
             }
         }
@@ -362,46 +393,35 @@
         }
 
         function deleteItem(category, index) {
-            const itemName = masterItemData[category][index].name;
-            if (confirm(`Are you sure you want to delete "${itemName}" from the master list?`)) {
+            if (confirm(`Are you sure you want to delete "${masterItemData[category][index].name}"?`)) {
                 masterItemData[category].splice(index, 1);
                 saveMasterList(); renderMasterList();
             }
         }
         
         function resetMasterListToDefaults() {
-             if (confirm('Are you sure you want to reset the master list? All your custom items and rates will be lost.')) {
+             if (confirm('Are you sure? All your custom items and rates will be lost.')) {
                 localStorage.removeItem(MASTER_LIST_KEY);
                 initializeMasterList();
             }
         }
 
         // --- BILL MANAGEMENT (RIGHT SIDE) ---
-
         function addItemToBill(item, qty = 1) {
-            const tbody = document.getElementById('bill-table').getElementsByTagName('tbody')[0];
-            const newRow = tbody.insertRow();
-            
-            newRow.innerHTML = `
-                <td class="row-number"></td>
-                <td>${item.name}</td>
+            const newRow = document.getElementById('bill-table').getElementsByTagName('tbody')[0].insertRow();
+            newRow.innerHTML = `<td class="row-number"></td><td>${item.name}</td>
                 <td><input type="number" class="details-input qty-input" value="${qty}" min="1" oninput="updateRowAmount(this.closest('tr'))"></td>
                 <td><input type="number" class="details-input rate-input" value="${item.rate}" min="0" oninput="updateRowAmount(this.closest('tr'))"></td>
                 <td class="amount-cell"></td>
-                <td><button class="delete-btn" onclick="deleteBillItem(this)">×</button></td>
-            `;
-            updateRowAmount(newRow); // Initial calculation
-            updateRowNumbers();
-            saveCurrentBillState();
+                <td><button class="delete-btn" onclick="deleteBillItem(this)">×</button></td>`;
+            updateRowAmount(newRow); updateRowNumbers(); saveCurrentBillState();
         }
         
         function updateRowAmount(row) {
             const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
             const rate = parseFloat(row.querySelector('.rate-input').value) || 0;
-            const amount = qty * rate;
-            row.querySelector('.amount-cell').textContent = amount.toFixed(2);
-            updateTotalAmount();
-            saveCurrentBillState();
+            row.querySelector('.amount-cell').textContent = (qty * rate).toFixed(2);
+            updateTotalAmount(); saveCurrentBillState();
         }
 
         function updateTotalAmount() {
@@ -412,14 +432,11 @@
 
         function deleteBillItem(button) {
             button.closest('tr').remove();
-            updateRowNumbers();
-            updateTotalAmount();
-            saveCurrentBillState();
+            updateRowNumbers(); updateTotalAmount(); saveCurrentBillState();
         }
 
         function updateRowNumbers() {
-            const rows = document.querySelectorAll('#bill-table tbody tr');
-            rows.forEach((row, index) => {
+            document.querySelectorAll('#bill-table tbody tr').forEach((row, index) => {
                 row.querySelector('.row-number').textContent = index + 1;
             });
         }
@@ -437,51 +454,209 @@
 
         function loadCurrentBillState() {
             const billData = JSON.parse(localStorage.getItem(CURRENT_BILL_ITEMS_KEY));
-            if (billData) {
-                billData.forEach(item => addItemToBill({ name: item.name, rate: item.rate }, item.qty));
-            }
+            if (billData) billData.forEach(item => addItemToBill({ name: item.name, rate: item.rate }, item.qty));
             const billTo = localStorage.getItem(CURRENT_BILL_TO_KEY);
-            if (billTo) {
-                document.getElementById('bill-to-input').value = billTo;
-            }
+            if (billTo) document.getElementById('bill-to-input').value = billTo;
+        }
+
+        function clearBillUI() {
+            document.getElementById('bill-table').getElementsByTagName('tbody')[0].innerHTML = '';
+            document.getElementById('bill-to-input').value = '';
+            localStorage.removeItem(CURRENT_BILL_ITEMS_KEY);
+            localStorage.removeItem(CURRENT_BILL_TO_KEY);
+            updateTotalAmount();
         }
 
         function resetCurrentBill() {
-             if (confirm('Are you sure you want to clear the current bill?')) {
-                document.getElementById('bill-table').getElementsByTagName('tbody')[0].innerHTML = '';
-                document.getElementById('bill-to-input').value = '';
-                localStorage.removeItem(CURRENT_BILL_ITEMS_KEY);
-                localStorage.removeItem(CURRENT_BILL_TO_KEY);
-                updateTotalAmount();
-            }
+             if (confirm('Are you sure you want to clear the current bill?')) clearBillUI();
         }
         
-        // --- BILLING & PRINTING ---
+        // --- BILLING, HISTORY & PRINTING ---
         function initializeBillCounter() {
             let billCounter = parseInt(localStorage.getItem(BILL_COUNTER_KEY) || '0');
             document.getElementById('bill-no-input').value = `UKB-${billCounter + 1}`;
         }
         
+        function saveBillToHistory(billId, customerName, totalAmount) {
+            const billRows = document.querySelectorAll('#bill-table tbody tr');
+            const billItems = Array.from(billRows).map(row => ({
+                name: row.cells[1].textContent,
+                qty: row.querySelector('.qty-input').value,
+                rate: row.querySelector('.rate-input').value
+            }));
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth(); // 0-11
+            const history = JSON.parse(localStorage.getItem(BILL_HISTORY_KEY)) || {};
+            if (!history[year]) history[year] = {};
+            if (!history[year][month]) history[year][month] = [];
+            
+            const newBillEntry = { billId, customerName, date: now.toISOString(), total: totalAmount, items: billItems };
+            history[year][month].push(newBillEntry);
+            localStorage.setItem(BILL_HISTORY_KEY, JSON.stringify(history));
+        }
+
         function generateAndPrintBill() {
-            const billBody = document.getElementById('bill-table').getElementsByTagName('tbody')[0];
-            if(billBody.rows.length === 0) {
-                alert("Cannot generate an empty bill. Please add items.");
-                return;
+            if(document.getElementById('bill-table').getElementsByTagName('tbody')[0].rows.length === 0) {
+                alert("Cannot generate an empty bill. Please add items."); return;
             }
 
             let currentBillNo = parseInt(localStorage.getItem(BILL_COUNTER_KEY) || '0') + 1;
+            const billId = `UKB-${currentBillNo}`;
+            const customerName = document.getElementById('bill-to-input').value || 'N/A';
+            const totalAmount = parseFloat(document.getElementById('total-amount').textContent);
             
-            // Prepare printable header
-            document.getElementById('bill-no-print').textContent = `UKB-${currentBillNo}`;
+            saveBillToHistory(billId, customerName, totalAmount);
+            
+            document.getElementById('bill-no-print').textContent = billId;
             document.getElementById('bill-date-print').textContent = new Date().toLocaleDateString('en-GB');
-            document.getElementById('bill-to-print').textContent = document.getElementById('bill-to-input').value || 'N/A';
+            document.getElementById('bill-to-print').textContent = customerName;
             
             window.print();
 
-            // After printing is initiated, update the counter and clear the bill
             localStorage.setItem(BILL_COUNTER_KEY, currentBillNo);
-            resetCurrentBill();
+            clearBillUI();
             initializeBillCounter();
+            renderBillHistory();
+        }
+
+        function renderBillHistory() {
+            const history = JSON.parse(localStorage.getItem(BILL_HISTORY_KEY)) || {};
+            const container = document.getElementById('history-list');
+            container.innerHTML = '<p class="text-sm text-gray-500">Your saved bills will appear here.</p>';
+
+            const years = Object.keys(history).sort((a, b) => b - a);
+            if (years.length === 0) return;
+            container.innerHTML = '';
+
+            years.forEach(year => {
+                const yearDetails = document.createElement('details');
+                yearDetails.open = true;
+                yearDetails.innerHTML = `<summary>${year}</summary>`;
+                const months = Object.keys(history[year]).sort((a, b) => b - a);
+                months.forEach(month => {
+                    const monthDetails = document.createElement('details');
+                    monthDetails.open = true;
+                    monthDetails.innerHTML = `<summary>${monthNames[month]}</summary>`;
+                    const bills = history[year][month].sort((a,b) => new Date(b.date) - new Date(a.date));
+                    bills.forEach(bill => {
+                        const billDate = new Date(bill.date);
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'history-list-item';
+                        itemDiv.innerHTML = `<span>
+                                <strong>${bill.billId}</strong> - ${bill.customerName.substring(0, 15)}
+                                <br><small class="text-gray-600">${billDate.toLocaleDateString('en-GB')}</small>
+                            </span>
+                            <strong class="text-blue-600">₹${bill.total.toFixed(2)}</strong>`;
+                        itemDiv.onclick = () => {
+                            if (confirm(`This will replace the current unsaved bill. Restore bill ${bill.billId}?`)) {
+                                restoreBillFromHistory(year, month, bill.billId);
+                            }
+                        };
+                        monthDetails.appendChild(itemDiv);
+                    });
+                    yearDetails.appendChild(monthDetails);
+                });
+                container.appendChild(yearDetails);
+            });
+        }
+
+        function restoreBillFromHistory(year, month, billId) {
+            const history = JSON.parse(localStorage.getItem(BILL_HISTORY_KEY));
+            const bill = history[year][month].find(b => b.billId === billId);
+            if (!bill) { alert('Could not find the bill in history.'); return; }
+            clearBillUI();
+            document.getElementById('bill-to-input').value = bill.customerName;
+            bill.items.forEach(item => addItemToBill({ name: item.name, rate: item.rate }, item.qty));
+        }
+
+        // --- MONTHLY REPORT ---
+        function showReportModal() {
+            populateReportSelectors();
+            document.getElementById('report-modal').style.display = 'flex';
+        }
+
+        function hideReportModal() {
+            document.getElementById('report-modal').style.display = 'none';
+        }
+
+        function populateReportSelectors() {
+            const history = JSON.parse(localStorage.getItem(BILL_HISTORY_KEY)) || {};
+            const yearSelect = document.getElementById('report-year-select');
+            const monthSelect = document.getElementById('report-month-select');
+            yearSelect.innerHTML = '<option value="">Select Year</option>';
+            monthSelect.innerHTML = '<option value="">Select Month</option>';
+            Object.keys(history).sort((a, b) => b - a).forEach(year => {
+                yearSelect.innerHTML += `<option value="${year}">${year}</option>`;
+            });
+            yearSelect.onchange = () => {
+                monthSelect.innerHTML = '<option value="">Select Month</option>';
+                const selectedYear = yearSelect.value;
+                if (selectedYear && history[selectedYear]) {
+                    Object.keys(history[selectedYear]).sort((a, b) => b - a).forEach(month => {
+                        monthSelect.innerHTML += `<option value="${month}">${monthNames[month]}</option>`;
+                    });
+                }
+            };
+        }
+        
+        function generateAndDisplayReport() {
+            const year = document.getElementById('report-year-select').value;
+            const month = document.getElementById('report-month-select').value;
+            const outputDiv = document.getElementById('report-output');
+            const printBtnContainer = document.getElementById('report-print-button-container');
+
+            if (!year || !month) {
+                outputDiv.innerHTML = '<p class="text-red-500">Please select a year and a month.</p>';
+                printBtnContainer.style.display = 'none'; return;
+            }
+            const history = JSON.parse(localStorage.getItem(BILL_HISTORY_KEY)) || {};
+            const bills = (history[year] && history[year][month]) ? history[year][month] : [];
+            if (bills.length === 0) {
+                outputDiv.innerHTML = `<p class="text-gray-600">No bills found for ${monthNames[month]} ${year}.</p>`;
+                printBtnContainer.style.display = 'none'; return;
+            }
+
+            const totalRevenue = bills.reduce((sum, bill) => sum + bill.total, 0);
+            const itemSummary = {};
+            bills.forEach(bill => {
+                bill.items.forEach(item => {
+                    const qty = parseFloat(item.qty), rate = parseFloat(item.rate), total = qty * rate;
+                    if (!itemSummary[item.name]) itemSummary[item.name] = { totalQty: 0, totalRevenue: 0 };
+                    itemSummary[item.name].totalQty += qty;
+                    itemSummary[item.name].totalRevenue += total;
+                });
+            });
+
+            outputDiv.innerHTML = `
+                <div class="printable-report">
+                    <div class="text-center mb-6">
+                        <h1 class="text-3xl font-bold">UMMEES KITCHEN</h1>
+                        <h2 class="text-2xl font-semibold text-gray-700">Monthly Report: ${monthNames[month]} ${year}</h2>
+                        <p class="text-gray-500">Generated on: ${new Date().toLocaleDateString('en-GB')}</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-blue-100 p-4 rounded-lg shadow-md text-center"><h3 class="font-bold text-blue-800">Total Revenue</h3><p class="text-4xl font-bold text-blue-900">₹${totalRevenue.toFixed(2)}</p></div>
+                        <div class="bg-green-100 p-4 rounded-lg shadow-md text-center"><h3 class="font-bold text-green-800">Total Bills</h3><p class="text-4xl font-bold text-green-900">${bills.length}</p></div>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">Item-wise Sales Summary</h3>
+                    <table class="w-full text-left border-collapse mb-8 text-sm md:text-base">
+                        <thead class="bg-gray-200"><tr><th class="p-2 border">Item</th><th class="p-2 border text-right">Total Qty</th><th class="p-2 border text-right">Total Revenue</th></tr></thead>
+                        <tbody>${Object.keys(itemSummary).sort().map(name => `<tr class="border-b"><td class="p-2 border">${name}</td><td class="p-2 border text-right">${itemSummary[name].totalQty}</td><td class="p-2 border text-right">₹${itemSummary[name].totalRevenue.toFixed(2)}</td></tr>`).join('')}</tbody>
+                    </table>
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">Detailed Bill List</h3>
+                    <table class="w-full text-left border-collapse text-sm md:text-base">
+                         <thead class="bg-gray-200"><tr><th class="p-2 border">Bill ID</th><th class="p-2 border">Date</th><th class="p-2 border">Customer</th><th class="p-2 border text-right">Amount</th></tr></thead>
+                        <tbody>${bills.sort((a,b) => new Date(a.date) - new Date(b.date)).map(bill => `<tr class="border-b"><td class="p-2 border">${bill.billId}</td><td class="p-2 border">${new Date(bill.date).toLocaleDateString('en-GB')}</td><td class="p-2 border">${bill.customerName}</td><td class="p-2 border text-right">₹${bill.total.toFixed(2)}</td></tr>`).join('')}</tbody>
+                    </table>
+                </div>`;
+            printBtnContainer.style.display = 'block';
+        }
+
+        function printReport() {
+            document.body.classList.add('printing-report');
+            window.print();
+            document.body.classList.remove('printing-report');
         }
 
         // --- INITIALIZATION ---
@@ -489,6 +664,7 @@
             initializeMasterList();
             loadCurrentBillState();
             initializeBillCounter();
+            renderBillHistory();
         };
     </script>
 </body>
