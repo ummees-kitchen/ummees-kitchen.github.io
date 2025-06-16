@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Added Tailwind CSS for new components -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         :root {
@@ -30,7 +29,6 @@
         }
 
         .container {
-            /* Changed to grid for 3 columns */
             display: grid;
             grid-template-columns: minmax(400px, 1fr) 2fr minmax(350px, 1fr);
             gap: 20px;
@@ -153,21 +151,61 @@
             max-width: 900px; max-height: 90vh; overflow-y: auto;
         }
 
-        /* Print Styles */
+        /* --- START: PRINT STYLE FIXES --- */
         @media print {
-            body { padding: 0; margin: 0; font-size: 12pt; color: #000; background: #fff; }
+            /* Hide non-essential elements */
             .item-selector, .bill-preview-container h2, .controls, .edit-controls, .delete-btn, #print-button-container, .bill-history-container, .modal-overlay {
                 display: none;
             }
-            .container, .bill-preview-container { width: 100%; margin: 0; padding: 0; box-shadow: none; }
-            #printable-bill { display: block; }
+
+            /* Reset body and html for printing */
+            html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                background: #fff;
+                color: #000;
+                font-size: 14pt; /* Increased font size for better A4 readability */
+            }
+
+            /* Override the grid layout and make the container a simple block */
+            .container {
+                display: block;
+                width: 100%;
+                max-width: none;
+                grid-template-columns: none;
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+            }
+
+            /* Ensure the preview container and printable area take up the full width */
+            .bill-preview-container, #printable-bill {
+                display: block;
+                width: 100%;
+                padding: 0;
+                margin: 0;
+                box-shadow: none;
+                max-height: none;
+                overflow: visible;
+            }
+            
+            /* Make the bill content visible and styled for print */
             .bill-header { display: block; }
             #bill-table { width: 100%; }
-            #bill-table th, #bill-table td { border-bottom: 1px solid #ccc; padding: 8px 4px; }
+            #bill-table th, #bill-table td { 
+                border-bottom: 1px solid #ccc; 
+                padding: 10px 5px; /* Adjusted padding for print */
+            }
             #bill-table td:last-child { border-bottom: 1px solid #ccc; }
-            .details-input { border: none; background: transparent; width: 100%; font-size: 12pt; font-family: 'Noto Sans Malayalam', sans-serif; }
+            .details-input {
+                border: none; background: transparent; width: 100%;
+                font-size: 14pt; /* Match body font size */
+                font-family: 'Noto Sans Malayalam', sans-serif;
+            }
             #bill-footer { display: block; }
-            
+
             /* Styles for Report Printing */
             body.printing-report .container, body.printing-report #printable-bill { display: none; }
             body.printing-report .modal-overlay { display: block !important; position: static; background: none; }
@@ -182,6 +220,8 @@
             }
             body.printing-report #report-output { display: block; }
         }
+        /* --- END: PRINT STYLE FIXES --- */
+
     </style>
 </head>
 <body>
