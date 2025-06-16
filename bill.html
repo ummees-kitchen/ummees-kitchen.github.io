@@ -18,7 +18,6 @@
             --edit-mode-bg: #fffbe6;
             --danger-color: #d9534f;
         }
-
         body {
             font-family: 'Noto Sans Malayalam', sans-serif;
             background-color: var(--background-color);
@@ -27,7 +26,6 @@
             padding: 20px;
             font-size: 16px;
         }
-
         .container {
             display: grid;
             grid-template-columns: minmax(400px, 1fr) 2fr minmax(350px, 1fr);
@@ -35,38 +33,23 @@
             max-width: 1800px;
             margin: 0 auto;
         }
-
         .item-selector, .bill-preview-container, .bill-history-container {
-            background: #fff;
-            border-radius: 8px;
-            padding: 20px;
+            background: #fff; border-radius: 8px; padding: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s;
-            max-height: 90vh;
-            overflow-y: auto;
+            max-height: 90vh; overflow-y: auto;
         }
-
-        .item-selector { flex: 1; min-width: 400px; }
-        .bill-preview-container { flex: 2; min-width: 500px; }
-        
         .item-selector.edit-mode-active { background-color: var(--edit-mode-bg); }
-
         h1, h2, h3 {
-            color: var(--secondary-color);
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px;
+            color: var(--secondary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px;
         }
-
         .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
         .bill-info { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .edit-controls { display: flex; gap: 10px; margin-top: 15px; }
-
         input[type="text"], input[type="number"] {
              padding: 9px; border: 1px solid var(--border-color); border-radius: 5px;
              font-family: 'Noto Sans Malayalam', sans-serif; font-size: 0.9em; width: 100%; box-sizing: border-box;
         }
         .bill-info input[type="text"]#bill-no-input { background-color: #e9ecef; cursor: not-allowed; }
-
         button {
             padding: 10px 15px; border: none; border-radius: 5px;
             background-color: var(--primary-color); color: #fff;
@@ -77,14 +60,11 @@
         button.print-btn { background-color: #38a169; width: 100%; font-size: 1.1em; padding: 12px; }
         button.secondary-btn { background-color: #6c757d; }
         button.edit-btn { background-color: #f0ad4e; }
-
         #item-categories { column-count: 1; column-gap: 20px; }
-        
         .category-group {
             border: 1px solid var(--border-color); border-radius: 5px;
             padding: 15px; margin-bottom: 15px; break-inside: avoid;
         }
-
         .category-header { display: flex; justify-content: space-between; align-items: center; }
         .category-group legend { font-weight: bold; font-size: 1.2em; color: var(--secondary-color); padding: 0 10px; }
         .item-list { list-style-type: none; padding: 0; margin: 0; }
@@ -94,22 +74,15 @@
         .item-list li:hover { background-color: #f0f4f8; }
         .item-list label { flex-grow: 1; cursor: pointer; }
         .item-rate { margin-left: auto; padding-left: 15px; font-weight: bold; color: var(--primary-color); }
-        
         .edit-icon {
             display: none; cursor: pointer; font-size: 0.8em; margin-left: 8px;
             color: #718096; background: #edf2f7; border-radius: 4px; padding: 2px 6px;
         }
         .edit-icon:hover { color: #2d3748; background: #e2e8f0; }
         .item-selector.edit-mode-active .edit-icon { display: inline-block; }
-        .add-item-btn { display: none; margin-top: 10px; font-size: 0.9em; padding: 5px 10px; }
-        .item-selector.edit-mode-active .add-item-btn { display: block; }
-
         /* Bill Preview Styles */
         #printable-bill { padding: 10px; }
-        .bill-header {
-            text-align: center; margin-bottom: 20px;
-            border-bottom: 3px double #333; padding-bottom: 15px;
-        }
+        .bill-header { text-align: center; margin-bottom: 20px; border-bottom: 3px double #333; padding-bottom: 15px; }
         .bill-header h1 { margin: 0; font-size: 2.2em; color: var(--header-bg); border: none; }
         .bill-header p { margin: 2px 0; font-size: 1.1em; }
         .bill-meta { margin-top: 15px; text-align: left; display: flex; justify-content: space-between; }
@@ -119,17 +92,10 @@
         #bill-table th:first-child, #bill-table td:first-child { width: 40px; text-align: center;}
         #bill-table th:last-child, #bill-table td:last-child { text-align: right; }
         #bill-table td:nth-child(5) { font-weight: bold; }
-        .details-input {
-            width: 100%; padding: 6px; border: 1px solid var(--border-color);
-            border-radius: 4px; font-size: 0.95em; box-sizing: border-box; text-align: right;
-        }
-        .delete-btn {
-            background: none; border: none; color: #e53e3e; font-size: 1.5em;
-            cursor: pointer; padding: 0 5px; line-height: 1;
-        }
+        .details-input { width: 100%; padding: 6px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 0.95em; box-sizing: border-box; text-align: right; }
+        .delete-btn { background: none; border: none; color: #e53e3e; font-size: 1.5em; cursor: pointer; padding: 0 5px; line-height: 1; }
         #bill-table tfoot td { font-weight: bold; font-size: 1.2em; text-align: right; }
         #bill-footer { display: none; margin-top: 40px; text-align: center; font-size: 1em; font-style: italic; }
-
         /* History List Styles */
         .history-list-item {
             padding: 8px 12px; margin-bottom: 5px; border: 1px solid var(--border-color);
@@ -137,91 +103,35 @@
             display: flex; justify-content: space-between; align-items: center;
         }
         .history-list-item:hover { background-color: #f0f4f8; border-color: var(--primary-color); }
+        .delete-history-btn { font-size: 1.2em; color: #aaa; font-weight: bold; cursor: pointer; padding: 0 5px; }
+        .delete-history-btn:hover { color: var(--danger-color); }
         details { margin-bottom: 10px; border-left: 2px solid var(--border-color); padding-left: 15px; }
         summary { font-weight: bold; cursor: pointer; padding: 5px; }
-
         /* Modal for Report */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.5); display: none; justify-content: center;
-            align-items: center; z-index: 1000;
-        }
-        .modal-content {
-            background: white; padding: 30px; border-radius: 8px; width: 90%;
-            max-width: 900px; max-height: 90vh; overflow-y: auto;
-        }
-
-        /* --- START: PRINT STYLE FIXES --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 8px; width: 90%; max-width: 900px; max-height: 90vh; overflow-y: auto; }
+        /* New Inline Form Styles */
+        .inline-add-form { display: flex; gap: 8px; margin-top: 15px; }
+        .inline-add-form input { flex-grow: 1; }
+        .inline-add-form button { padding: 8px 12px; font-size: 0.9em; flex-shrink: 0; }
+        
         @media print {
-            /* Hide non-essential elements */
-            .item-selector, .bill-preview-container h2, .controls, .edit-controls, .delete-btn, #print-button-container, .bill-history-container, .modal-overlay {
-                display: none;
-            }
-
-            /* Reset body and html for printing */
-            html, body {
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                padding: 0;
-                background: #fff;
-                color: #000;
-                font-size: 14pt; /* Increased font size for better A4 readability */
-            }
-
-            /* Override the grid layout and make the container a simple block */
-            .container {
-                display: block;
-                width: 100%;
-                max-width: none;
-                grid-template-columns: none;
-                margin: 0;
-                padding: 0;
-                box-shadow: none;
-            }
-
-            /* Ensure the preview container and printable area take up the full width */
-            .bill-preview-container, #printable-bill {
-                display: block;
-                width: 100%;
-                padding: 0;
-                margin: 0;
-                box-shadow: none;
-                max-height: none;
-                overflow: visible;
-            }
-            
-            /* Make the bill content visible and styled for print */
+            html, body { width: 100%; height: 100%; margin: 0; padding: 0; background: #fff; color: #000; font-size: 14pt; }
+            .item-selector, .bill-preview-container h2, .controls, .edit-controls, .delete-btn, #print-button-container, .bill-history-container, .modal-overlay { display: none; }
+            .container { display: block; width: 100%; max-width: none; grid-template-columns: none; margin: 0; padding: 0; box-shadow: none; }
+            .bill-preview-container, #printable-bill { display: block; width: 100%; padding: 0; margin: 0; box-shadow: none; max-height: none; overflow: visible; }
             .bill-header { display: block; }
             #bill-table { width: 100%; }
-            #bill-table th, #bill-table td { 
-                border-bottom: 1px solid #ccc; 
-                padding: 10px 5px; /* Adjusted padding for print */
-            }
+            #bill-table th, #bill-table td { border-bottom: 1px solid #ccc; padding: 10px 5px; }
             #bill-table td:last-child { border-bottom: 1px solid #ccc; }
-            .details-input {
-                border: none; background: transparent; width: 100%;
-                font-size: 14pt; /* Match body font size */
-                font-family: 'Noto Sans Malayalam', sans-serif;
-            }
+            .details-input { border: none; background: transparent; width: 100%; font-size: 14pt; font-family: 'Noto Sans Malayalam', sans-serif; }
             #bill-footer { display: block; }
-
-            /* Styles for Report Printing */
             body.printing-report .container, body.printing-report #printable-bill { display: none; }
             body.printing-report .modal-overlay { display: block !important; position: static; background: none; }
-            body.printing-report .modal-content {
-                box-shadow: none; border: none; width: 100%; max-width: 100%;
-                padding: 0; max-height: none; overflow: visible;
-            }
-            body.printing-report .modal-content > div:not(#report-output),
-            body.printing-report #report-print-button-container,
-            body.printing-report .modal-content > hr {
-                display: none;
-            }
+            body.printing-report .modal-content { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; max-height: none; overflow: visible; }
+            body.printing-report .modal-content > div:not(#report-output), body.printing-report #report-print-button-container, body.printing-report .modal-content > hr { display: none; }
             body.printing-report #report-output { display: block; }
         }
-        /* --- END: PRINT STYLE FIXES --- */
-
     </style>
 </head>
 <body>
@@ -229,12 +139,17 @@
         <div class="item-selector" id="item-selector-container">
             <h1>Master Item & Rate List</h1>
              <div class="edit-controls">
-                <button onclick="toggleEditMode()" id="edit-mode-btn" class="edit-btn">Edit Master List</button>
+                <button onclick="toggleEditMode()" id="edit-mode-btn" class="edit-btn">Toggle Edit/Delete Icons</button>
                 <button onclick="resetMasterListToDefaults()" class="secondary-btn">Reset to Defaults</button>
             </div>
             <div id="item-categories"></div>
-             <div class="edit-controls">
-                 <button onclick="addNewCategory()" class="add-item-btn" style="width:100%; margin-top: 20px;">+ Add New Category</button>
+            
+            <div class="add-new-master-section" style="margin-top: 25px; padding-top: 20px; border-top: 2px solid var(--border-color);">
+                <h3>Add New Category</h3>
+                <div class="inline-add-form">
+                    <input type="text" id="new-category-name-input" placeholder="Category Name">
+                    <button onclick="handleAddNewCategory()">Add Category</button>
+                </div>
             </div>
         </div>
 
@@ -247,25 +162,16 @@
              <div class="controls">
                 <button onclick="resetCurrentBill()" class="secondary-btn">Clear Bill</button>
             </div>
-            
             <div id="printable-bill">
                 <div class="bill-header">
-                    <h1>UMMEES KITCHEN</h1>
-                    <p>EVENT, CATERING SERVICE, VILAYIL</p>
-                    <p><strong>SULAIMAN</strong></p>
-                    <p>Ph: 9746612153, 9539454000</p>
-                    <div class="bill-meta">
-                        <p>Bill No: <span id="bill-no-print"></span></p>
-                        <p>Date: <span id="bill-date-print"></span></p>
-                    </div>
-                     <p style="text-align:left; margin-top:10px;">To: <strong id="bill-to-print"></strong></p>
+                    <h1>UMMEES KITCHEN</h1><p>EVENT, CATERING SERVICE, VILAYIL</p><p><strong>SULAIMAN</strong></p><p>Ph: 9746612153, 9539454000</p>
+                    <div class="bill-meta"><p>Bill No: <span id="bill-no-print"></span></p><p>Date: <span id="bill-date-print"></span></p></div>
+                    <p style="text-align:left; margin-top:10px;">To: <strong id="bill-to-print"></strong></p>
                 </div>
                 <table id="bill-table">
                     <thead><tr><th>No.</th><th>Item</th><th>Qty</th><th>Rate</th><th>Amount</th><th></th></tr></thead>
                     <tbody></tbody>
-                    <tfoot>
-                        <tr><td colspan="4">Total Amount</td><td id="total-amount">0.00</td><td></td></tr>
-                    </tfoot>
+                    <tfoot><tr><td colspan="4">Total Amount</td><td id="total-amount">0.00</td><td></td></tr></tfoot>
                 </table>
                 <div id="bill-footer"><p>Thank you for your business!</p></div>
             </div>
@@ -277,13 +183,9 @@
         <div class="bill-history-container">
             <h2>Bill History</h2>
             <div class="history-controls mb-4">
-                 <button onclick="showReportModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
-                    Generate Monthly Report
-                </button>
+                 <button onclick="showReportModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">Generate Monthly Report</button>
             </div>
-            <div id="history-list">
-                <!-- History will be populated by JS -->
-            </div>
+            <div id="history-list"></div>
         </div>
     </div>
 
@@ -300,33 +202,23 @@
                 <button onclick="generateAndDisplayReport()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full md:w-auto">Generate</button>
             </div>
             <hr class="my-4"/>
-            <div id="report-output">
-                <p class="text-gray-500">Select a year and month to generate a report.</p>
-            </div>
+            <div id="report-output"><p class="text-gray-500">Select a year and month to generate a report.</p></div>
              <div id="report-print-button-container" class="mt-6 text-right" style="display: none;">
                 <button onclick="printReport()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded text-lg">Print Report</button>
             </div>
         </div>
     </div>
 
-
     <script>
         // --- DATA ---
         let masterItemData = {};
-        const defaultItemData = {
-            "ഇറച്ചി": [ { name: "ചിക്കൻ കറി", rate: 160 }, { name: "ബീഫ് കറി", rate: 180 }, { name: "മട്ടൻ കറി", rate: 220 }, { name: "ചിക്കൻ ഫ്രൈ", rate: 170 }, { name: "ബീഫ് ഫ്രൈ", rate: 190 }, { name: "ചിക്കൻ ബിരിയാണി", rate: 140 }, { name: "ബീഫ് ബിരിയാണി", rate: 160 }, { name: "മട്ടൻ ബിരിയാണി", rate: 200 } ],
-            "മീൻ": [ { name: "മീൻ കറി", rate: 120 }, { name: "മീൻ ഫ്രൈ", rate: 100 }, { name: "ചെമ്മീൻ റോസ്റ്റ്", rate: 250 }, { name: "കൂന്തൽ ഫ്രൈ", rate: 200 } ],
-            "പച്ചക്കറി": [ { name: "പരിപ്പ് കറി", rate: 60 }, { name: "സാമ്പാർ", rate: 70 }, { name: "അവിയൽ", rate: 80 }, { name: "തോരൻ", rate: 50 } ],
-            "അരി ആഹാരം": [ { name: "ചോറ്", rate: 40 }, { name: "നെയ്ച്ചോറ്", rate: 70 }, { name: "പൊറോട്ട", rate: 12 }, { name: "ചപ്പാത്തി", rate: 10 }, { name: "അപ്പം", rate: 10 }, { name: "ഇടിയപ്പം", rate: 10 } ],
-            "മറ്റുള്ളവ": [ { name: "സാലഡ്", rate: 30 }, { name: "പപ്പടം", rate: 5 }, { name: "അച്ചാർ", rate: 10 }, { name: "തൈര്", rate: 20 } ]
-        };
+        const defaultItemData = { "ഇറച്ചി": [ { name: "ചിക്കൻ കറി", rate: 160 }, { name: "ബീഫ് കറി", rate: 180 }, { name: "മട്ടൻ കറി", rate: 220 }, { name: "ചിക്കൻ ഫ്രൈ", rate: 170 }, { name: "ബീഫ് ഫ്രൈ", rate: 190 }, { name: "ചിക്കൻ ബിരിയാണി", rate: 140 }, { name: "ബീഫ് ബിരിയാണി", rate: 160 }, { name: "മട്ടൻ ബിരിയാണി", rate: 200 } ], "മീൻ": [ { name: "മീൻ കറി", rate: 120 }, { name: "മീൻ ഫ്രൈ", rate: 100 }, { name: "ചെമ്മീൻ റോസ്റ്റ്", rate: 250 }, { name: "കൂന്തൽ ഫ്രൈ", rate: 200 } ], "പച്ചക്കറി": [ { name: "പരിപ്പ് കറി", rate: 60 }, { name: "സാമ്പാർ", rate: 70 }, { name: "അവിയൽ", rate: 80 }, { name: "തോരൻ", rate: 50 } ], "അരി ആഹാരം": [ { name: "ചോറ്", rate: 40 }, { name: "നെയ്ച്ചോറ്", rate: 70 }, { name: "പൊറോട്ട", rate: 12 }, { name: "ചപ്പാത്തി", rate: 10 }, { name: "അപ്പം", rate: 10 }, { name: "ഇടിയപ്പം", rate: 10 } ], "മറ്റുള്ളവ": [ { name: "സാലഡ്", rate: 30 }, { name: "പപ്പടം", rate: 5 }, { name: "അച്ചാർ", rate: 10 }, { name: "തൈര്", rate: 20 } ] };
         const MASTER_LIST_KEY = 'ummeesBillingMasterData';
         const CURRENT_BILL_ITEMS_KEY = 'ummeesCurrentBillItems';
         const CURRENT_BILL_TO_KEY = 'ummeesCurrentBillTo';
         const BILL_COUNTER_KEY = 'ummeesBillCounter';
         const BILL_HISTORY_KEY = 'ummeesBillHistory';
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
 
         // --- MASTER LIST MANAGEMENT (LEFT SIDE) ---
         function initializeMasterList() {
@@ -344,6 +236,7 @@
             for (const category in masterItemData) {
                 const fieldset = document.createElement('fieldset');
                 fieldset.className = 'category-group';
+                
                 const catHeader = document.createElement('div');
                 catHeader.className = 'category-header';
                 catHeader.innerHTML = `<legend>${category}</legend>
@@ -352,6 +245,7 @@
                         <span class="edit-icon" onclick="deleteCategory('${category}')" style="color:var(--danger-color);">delete</span>
                     </div>`;
                 fieldset.appendChild(catHeader);
+                
                 const ul = document.createElement('ul');
                 ul.className = 'item-list';
                 masterItemData[category].forEach((item, index) => {
@@ -364,36 +258,48 @@
                     ul.appendChild(li);
                 });
                 fieldset.appendChild(ul);
-                const addItemBtn = document.createElement('button');
-                addItemBtn.className = 'add-item-btn secondary-btn';
-                addItemBtn.textContent = '+ Add Item';
-                addItemBtn.onclick = () => addNewItem(category);
-                fieldset.appendChild(addItemBtn);
+                
+                // Add the inline form for new items
+                const addItemForm = document.createElement('div');
+                addItemForm.className = 'inline-add-form';
+                const sanitizedCategory = category.replace(/[^a-zA-Z0-9]/g, ''); // Sanitize for ID
+                addItemForm.innerHTML = `
+                    <input type="text" id="new-item-name-${sanitizedCategory}" placeholder="Item Name" style="width: 60%;">
+                    <input type="number" id="new-item-rate-${sanitizedCategory}" placeholder="Rate" style="width: 25%;">
+                    <button onclick="handleAddNewItem('${category}')" class="secondary-btn">Add</button>
+                `;
+                fieldset.appendChild(addItemForm);
                 container.appendChild(fieldset);
             }
         }
         
         function toggleEditMode() {
-            const container = document.getElementById('item-selector-container');
-            const btn = document.getElementById('edit-mode-btn');
-            container.classList.toggle('edit-mode-active');
-            if (container.classList.contains('edit-mode-active')) {
-                btn.textContent = 'Done Editing';
-                btn.style.backgroundColor = '#5cb85c';
-            } else {
-                btn.textContent = 'Edit Master List';
-                btn.style.backgroundColor = '#f0ad4e';
-            }
-            renderMasterList();
+            document.getElementById('item-selector-container').classList.toggle('edit-mode-active');
         }
 
-        function addNewCategory() {
-            const name = prompt("Enter new category name:");
-            if (name && name.trim()) {
-                if (masterItemData[name.trim()]) { alert("This category already exists."); return; }
-                masterItemData[name.trim()] = [];
+        function handleAddNewCategory() {
+            const input = document.getElementById('new-category-name-input');
+            const name = input.value.trim();
+            if (name) {
+                if (masterItemData[name]) { alert("This category already exists."); return; }
+                masterItemData[name] = [];
                 saveMasterList(); renderMasterList();
+                input.value = '';
             }
+        }
+        
+        function handleAddNewItem(category) {
+            const sanitizedCategory = category.replace(/[^a-zA-Z0-9]/g, '');
+            const nameInput = document.getElementById(`new-item-name-${sanitizedCategory}`);
+            const rateInput = document.getElementById(`new-item-rate-${sanitizedCategory}`);
+            const name = nameInput.value.trim();
+            const rate = parseFloat(rateInput.value);
+
+            if (!name) { alert("Please enter an item name."); return; }
+            if (isNaN(rate)) { alert("Invalid rate. Please enter a number."); return; }
+            
+            masterItemData[category].push({ name, rate });
+            saveMasterList(); renderMasterList();
         }
 
         function editCategory(oldName) {
@@ -412,21 +318,15 @@
                 saveMasterList(); renderMasterList();
             }
         }
-        
-        function addNewItem(category) {
-            const name = prompt(`Enter new item name for "${category}":`);
-            if (!name || !name.trim()) return;
-            const rate = parseFloat(prompt(`Enter rate for "${name.trim()}":`));
-            if (isNaN(rate)) { alert("Invalid rate. Please enter a number."); return; }
-            masterItemData[category].push({ name: name.trim(), rate: rate });
-            saveMasterList(); renderMasterList();
-        }
 
         function editItem(category, index) {
             const oldItem = masterItemData[category][index];
             const newName = prompt(`Edit item name:`, oldItem.name);
-            if (!newName || !newName.trim()) return;
-            const newRate = parseFloat(prompt(`Edit rate for "${newName.trim()}":`, oldItem.rate));
+            if (newName === null) return;
+            const newRateStr = prompt(`Edit rate for "${newName.trim()}":`, oldItem.rate);
+            if (newRateStr === null) return;
+
+            const newRate = parseFloat(newRateStr);
             if (isNaN(newRate)) { alert("Invalid rate. Please enter a number."); return; }
             masterItemData[category][index] = { name: newName.trim(), rate: newRate };
             saveMasterList(); renderMasterList();
@@ -483,11 +383,7 @@
         
         function saveCurrentBillState() {
             const billRows = document.querySelectorAll('#bill-table tbody tr');
-            const billData = Array.from(billRows).map(row => ({
-                name: row.cells[1].textContent,
-                qty: row.querySelector('.qty-input').value,
-                rate: row.querySelector('.rate-input').value
-            }));
+            const billData = Array.from(billRows).map(row => ({ name: row.cells[1].textContent, qty: row.querySelector('.qty-input').value, rate: row.querySelector('.rate-input').value }));
             localStorage.setItem(CURRENT_BILL_ITEMS_KEY, JSON.stringify(billData));
             localStorage.setItem(CURRENT_BILL_TO_KEY, document.getElementById('bill-to-input').value);
         }
@@ -519,20 +415,13 @@
         
         function saveBillToHistory(billId, customerName, totalAmount) {
             const billRows = document.querySelectorAll('#bill-table tbody tr');
-            const billItems = Array.from(billRows).map(row => ({
-                name: row.cells[1].textContent,
-                qty: row.querySelector('.qty-input').value,
-                rate: row.querySelector('.rate-input').value
-            }));
+            const billItems = Array.from(billRows).map(row => ({ name: row.cells[1].textContent, qty: row.querySelector('.qty-input').value, rate: row.querySelector('.rate-input').value }));
             const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth(); // 0-11
             const history = JSON.parse(localStorage.getItem(BILL_HISTORY_KEY)) || {};
-            if (!history[year]) history[year] = {};
-            if (!history[year][month]) history[year][month] = [];
+            if (!history[now.getFullYear()]) history[now.getFullYear()] = {};
+            if (!history[now.getFullYear()][now.getMonth()]) history[now.getFullYear()][now.getMonth()] = [];
             
-            const newBillEntry = { billId, customerName, date: now.toISOString(), total: totalAmount, items: billItems };
-            history[year][month].push(newBillEntry);
+            history[now.getFullYear()][now.getMonth()].push({ billId, customerName, date: now.toISOString(), total: totalAmount, items: billItems });
             localStorage.setItem(BILL_HISTORY_KEY, JSON.stringify(history));
         }
 
@@ -540,7 +429,6 @@
             if(document.getElementById('bill-table').getElementsByTagName('tbody')[0].rows.length === 0) {
                 alert("Cannot generate an empty bill. Please add items."); return;
             }
-
             let currentBillNo = parseInt(localStorage.getItem(BILL_COUNTER_KEY) || '0') + 1;
             const billId = `UKB-${currentBillNo}`;
             const customerName = document.getElementById('bill-to-input').value || 'N/A';
@@ -551,7 +439,6 @@
             document.getElementById('bill-no-print').textContent = billId;
             document.getElementById('bill-date-print').textContent = new Date().toLocaleDateString('en-GB');
             document.getElementById('bill-to-print').textContent = customerName;
-            
             window.print();
 
             localStorage.setItem(BILL_COUNTER_KEY, currentBillNo);
@@ -583,16 +470,12 @@
                         const billDate = new Date(bill.date);
                         const itemDiv = document.createElement('div');
                         itemDiv.className = 'history-list-item';
-                        itemDiv.innerHTML = `<span>
-                                <strong>${bill.billId}</strong> - ${bill.customerName.substring(0, 15)}
+                        itemDiv.innerHTML = `<div class="flex-grow" onclick="restoreBillFromHistory('${year}', '${month}', '${bill.billId}')">
+                                <span><strong>${bill.billId}</strong> - ${bill.customerName.substring(0, 15)}</span>
                                 <br><small class="text-gray-600">${billDate.toLocaleDateString('en-GB')}</small>
-                            </span>
-                            <strong class="text-blue-600">₹${bill.total.toFixed(2)}</strong>`;
-                        itemDiv.onclick = () => {
-                            if (confirm(`This will replace the current unsaved bill. Restore bill ${bill.billId}?`)) {
-                                restoreBillFromHistory(year, month, bill.billId);
-                            }
-                        };
+                            </div>
+                            <strong class="text-blue-600 mx-2">₹${bill.total.toFixed(2)}</strong>
+                            <span class="delete-history-btn" onclick="deleteBillFromHistory(event, '${year}', '${month}', '${bill.billId}')">×</span>`;
                         monthDetails.appendChild(itemDiv);
                     });
                     yearDetails.appendChild(monthDetails);
@@ -602,6 +485,9 @@
         }
 
         function restoreBillFromHistory(year, month, billId) {
+            if (document.getElementById('bill-table').getElementsByTagName('tbody')[0].rows.length > 0) {
+                 if (!confirm(`This will replace the current unsaved bill. Restore bill ${billId}?`)) return;
+            }
             const history = JSON.parse(localStorage.getItem(BILL_HISTORY_KEY));
             const bill = history[year][month].find(b => b.billId === billId);
             if (!bill) { alert('Could not find the bill in history.'); return; }
@@ -609,25 +495,41 @@
             document.getElementById('bill-to-input').value = bill.customerName;
             bill.items.forEach(item => addItemToBill({ name: item.name, rate: item.rate }, item.qty));
         }
+        
+        function deleteBillFromHistory(event, year, month, billId) {
+            event.stopPropagation();
+            if (confirm(`Are you sure you want to permanently delete bill ${billId}? This cannot be undone.`)) {
+                const history = JSON.parse(localStorage.getItem(BILL_HISTORY_KEY));
+                const billsInMonth = history[year][month];
+                const billIndex = billsInMonth.findIndex(b => b.billId === billId);
+
+                if (billIndex > -1) {
+                    billsInMonth.splice(billIndex, 1);
+                    if (billsInMonth.length === 0) {
+                        delete history[year][month];
+                        if (Object.keys(history[year]).length === 0) {
+                            delete history[year];
+                        }
+                    }
+                    localStorage.setItem(BILL_HISTORY_KEY, JSON.stringify(history));
+                    renderBillHistory();
+                    populateReportSelectors(); // Update report dropdowns
+                }
+            }
+        }
 
         // --- MONTHLY REPORT ---
-        function showReportModal() {
-            populateReportSelectors();
-            document.getElementById('report-modal').style.display = 'flex';
-        }
-
-        function hideReportModal() {
-            document.getElementById('report-modal').style.display = 'none';
-        }
-
+        function showReportModal() { populateReportSelectors(); document.getElementById('report-modal').style.display = 'flex'; }
+        function hideReportModal() { document.getElementById('report-modal').style.display = 'none'; }
         function populateReportSelectors() {
             const history = JSON.parse(localStorage.getItem(BILL_HISTORY_KEY)) || {};
             const yearSelect = document.getElementById('report-year-select');
             const monthSelect = document.getElementById('report-month-select');
+            const currentYear = yearSelect.value;
             yearSelect.innerHTML = '<option value="">Select Year</option>';
             monthSelect.innerHTML = '<option value="">Select Month</option>';
             Object.keys(history).sort((a, b) => b - a).forEach(year => {
-                yearSelect.innerHTML += `<option value="${year}">${year}</option>`;
+                yearSelect.innerHTML += `<option value="${year}" ${year === currentYear ? 'selected' : ''}>${year}</option>`;
             });
             yearSelect.onchange = () => {
                 monthSelect.innerHTML = '<option value="">Select Month</option>';
@@ -638,8 +540,8 @@
                     });
                 }
             };
+            yearSelect.dispatchEvent(new Event('change')); // Trigger change to populate months if a year is pre-selected
         }
-        
         function generateAndDisplayReport() {
             const year = document.getElementById('report-year-select').value;
             const month = document.getElementById('report-month-select').value;
@@ -650,8 +552,7 @@
                 outputDiv.innerHTML = '<p class="text-red-500">Please select a year and a month.</p>';
                 printBtnContainer.style.display = 'none'; return;
             }
-            const history = JSON.parse(localStorage.getItem(BILL_HISTORY_KEY)) || {};
-            const bills = (history[year] && history[year][month]) ? history[year][month] : [];
+            const bills = (JSON.parse(localStorage.getItem(BILL_HISTORY_KEY))?.[year]?.[month]) || [];
             if (bills.length === 0) {
                 outputDiv.innerHTML = `<p class="text-gray-600">No bills found for ${monthNames[month]} ${year}.</p>`;
                 printBtnContainer.style.display = 'none'; return;
@@ -659,45 +560,19 @@
 
             const totalRevenue = bills.reduce((sum, bill) => sum + bill.total, 0);
             const itemSummary = {};
-            bills.forEach(bill => {
-                bill.items.forEach(item => {
-                    const qty = parseFloat(item.qty), rate = parseFloat(item.rate), total = qty * rate;
+            bills.forEach(bill => { bill.items.forEach(item => {
+                    const qty = parseFloat(item.qty), total = qty * parseFloat(item.rate);
                     if (!itemSummary[item.name]) itemSummary[item.name] = { totalQty: 0, totalRevenue: 0 };
                     itemSummary[item.name].totalQty += qty;
                     itemSummary[item.name].totalRevenue += total;
                 });
             });
 
-            outputDiv.innerHTML = `
-                <div class="printable-report">
-                    <div class="text-center mb-6">
-                        <h1 class="text-3xl font-bold">UMMEES KITCHEN</h1>
-                        <h2 class="text-2xl font-semibold text-gray-700">Monthly Report: ${monthNames[month]} ${year}</h2>
-                        <p class="text-gray-500">Generated on: ${new Date().toLocaleDateString('en-GB')}</p>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div class="bg-blue-100 p-4 rounded-lg shadow-md text-center"><h3 class="font-bold text-blue-800">Total Revenue</h3><p class="text-4xl font-bold text-blue-900">₹${totalRevenue.toFixed(2)}</p></div>
-                        <div class="bg-green-100 p-4 rounded-lg shadow-md text-center"><h3 class="font-bold text-green-800">Total Bills</h3><p class="text-4xl font-bold text-green-900">${bills.length}</p></div>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3 text-gray-800">Item-wise Sales Summary</h3>
-                    <table class="w-full text-left border-collapse mb-8 text-sm md:text-base">
-                        <thead class="bg-gray-200"><tr><th class="p-2 border">Item</th><th class="p-2 border text-right">Total Qty</th><th class="p-2 border text-right">Total Revenue</th></tr></thead>
-                        <tbody>${Object.keys(itemSummary).sort().map(name => `<tr class="border-b"><td class="p-2 border">${name}</td><td class="p-2 border text-right">${itemSummary[name].totalQty}</td><td class="p-2 border text-right">₹${itemSummary[name].totalRevenue.toFixed(2)}</td></tr>`).join('')}</tbody>
-                    </table>
-                    <h3 class="text-xl font-bold mb-3 text-gray-800">Detailed Bill List</h3>
-                    <table class="w-full text-left border-collapse text-sm md:text-base">
-                         <thead class="bg-gray-200"><tr><th class="p-2 border">Bill ID</th><th class="p-2 border">Date</th><th class="p-2 border">Customer</th><th class="p-2 border text-right">Amount</th></tr></thead>
-                        <tbody>${bills.sort((a,b) => new Date(a.date) - new Date(b.date)).map(bill => `<tr class="border-b"><td class="p-2 border">${bill.billId}</td><td class="p-2 border">${new Date(bill.date).toLocaleDateString('en-GB')}</td><td class="p-2 border">${bill.customerName}</td><td class="p-2 border text-right">₹${bill.total.toFixed(2)}</td></tr>`).join('')}</tbody>
-                    </table>
-                </div>`;
+            outputDiv.innerHTML = `<div class="printable-report"><div class="text-center mb-6"><h1 class="text-3xl font-bold">UMMEES KITCHEN</h1><h2 class="text-2xl font-semibold text-gray-700">Monthly Report: ${monthNames[month]} ${year}</h2><p class="text-gray-500">Generated on: ${new Date().toLocaleDateString('en-GB')}</p></div><div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8"><div class="bg-blue-100 p-4 rounded-lg shadow-md text-center"><h3 class="font-bold text-blue-800">Total Revenue</h3><p class="text-4xl font-bold text-blue-900">₹${totalRevenue.toFixed(2)}</p></div><div class="bg-green-100 p-4 rounded-lg shadow-md text-center"><h3 class="font-bold text-green-800">Total Bills</h3><p class="text-4xl font-bold text-green-900">${bills.length}</p></div></div><h3 class="text-xl font-bold mb-3 text-gray-800">Item-wise Sales Summary</h3><table class="w-full text-left border-collapse mb-8 text-sm md:text-base"><thead class="bg-gray-200"><tr><th class="p-2 border">Item</th><th class="p-2 border text-right">Total Qty</th><th class="p-2 border text-right">Total Revenue</th></tr></thead><tbody>${Object.keys(itemSummary).sort().map(name => `<tr class="border-b"><td class="p-2 border">${name}</td><td class="p-2 border text-right">${itemSummary[name].totalQty}</td><td class="p-2 border text-right">₹${itemSummary[name].totalRevenue.toFixed(2)}</td></tr>`).join('')}</tbody></table><h3 class="text-xl font-bold mb-3 text-gray-800">Detailed Bill List</h3><table class="w-full text-left border-collapse text-sm md:text-base"><thead class="bg-gray-200"><tr><th class="p-2 border">Bill ID</th><th class="p-2 border">Date</th><th class="p-2 border">Customer</th><th class="p-2 border text-right">Amount</th></tr></thead><tbody>${bills.sort((a,b) => new Date(a.date) - new Date(b.date)).map(bill => `<tr class="border-b"><td class="p-2 border">${bill.billId}</td><td class="p-2 border">${new Date(bill.date).toLocaleDateString('en-GB')}</td><td class="p-2 border">${bill.customerName}</td><td class="p-2 border text-right">₹${bill.total.toFixed(2)}</td></tr>`).join('')}</tbody></table></div>`;
             printBtnContainer.style.display = 'block';
         }
 
-        function printReport() {
-            document.body.classList.add('printing-report');
-            window.print();
-            document.body.classList.remove('printing-report');
-        }
+        function printReport() { document.body.classList.add('printing-report'); window.print(); document.body.classList.remove('printing-report'); }
 
         // --- INITIALIZATION ---
         window.onload = () => {
