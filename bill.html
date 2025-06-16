@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMMEES KITCHEN - Bill Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Malayalam:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0275d8;
+            --secondary-color: #2d3748;
+            --background-color: #f7fafc;
+            --border-color: #e2e8f0;
+            --header-bg: #59458B;
+            --edit-mode-bg: #fffbe6;
+            --danger-color: #d9534f;
+        }
+
+        body {
+            font-family: 'Noto Sans Malayalam', sans-serif;
+            background-color: var(--background-color);
+            color: var(--secondary-color);
+            margin: 0;
+            padding: 20px;
+            font-size: 16px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .item-selector, .bill-preview-container {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+
+        .item-selector { flex: 1; min-width: 400px; }
+        .bill-preview-container { flex: 2; min-width: 500px; }
+        
+        .item-selector.edit-mode-active { background-color: var(--edit-mode-bg); }
+
+        h1, h2, h3 {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .bill-info { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .edit-controls { display: flex; gap: 10px; margin-top: 15px; }
+
+        input[type="text"], input[type="number"] {
+             padding: 9px; border: 1px solid var(--border-color); border-radius: 5px;
+             font-family: 'Noto Sans Malayalam', sans-serif; font-size: 0.9em; width: 100%; box-sizing: border-box;
+        }
+        .bill-info input[type="text"]#bill-no-input { background-color: #e9ecef; cursor: not-allowed; }
+
+        button {
+            padding: 10px 15px; border: none; border-radius: 5px;
+            background-color: var(--primary-color); color: #fff;
+            font-family: 'Noto Sans Malayalam', sans-serif; font-size: 1em; cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover { opacity: 0.9; }
+        button.print-btn { background-color: #38a169; width: 100%; font-size: 1.1em; padding: 12px; }
+        button.secondary-btn { background-color: #6c757d; }
+        button.edit-btn { background-color: #f0ad4e; }
+
+        #item-categories { column-count: 1; column-gap: 20px; }
+        
+        .category-group {
+            border: 1px solid var(--border-color); border-radius: 5px;
+            padding: 15px; margin-bottom: 15px; break-inside: avoid;
+        }
+
+        .category-header { display: flex; justify-content: space-between; align-items: center; }
+        .category-group legend { font-weight: bold; font-size: 1.2em; color: var(--secondary-color); padding: 0 10px; }
+        .item-list { list-style-type: none; padding: 0; margin: 0; }
+        .item-list li { 
+            display: flex; align-items: center; margin-bottom: 8px; cursor: pointer; padding: 5px; border-radius: 4px;
+        }
+        .item-list li:hover { background-color: #f0f4f8; }
+        .item-list label { flex-grow: 1; cursor: pointer; }
+        .item-rate { margin-left: auto; padding-left: 15px; font-weight: bold; color: var(--primary-color); }
+        
+        .edit-icon {
+            display: none; cursor: pointer; font-size: 0.8em; margin-left: 8px;
+            color: #718096; background: #edf2f7; border-radius: 4px; padding: 2px 6px;
+        }
+        .edit-icon:hover { color: #2d3748; background: #e2e8f0; }
+        .item-selector.edit-mode-active .edit-icon { display: inline-block; }
+        .add-item-btn { display: none; margin-top: 10px; font-size: 0.9em; padding: 5px 10px; }
+        .item-selector.edit-mode-active .add-item-btn { display: block; }
+
+        /* Bill Preview Styles */
+        #printable-bill { padding: 10px; }
+        .bill-header {
+            text-align: center; margin-bottom: 20px;
+            border-bottom: 3px double #333; padding-bottom: 15px;
+        }
+        .bill-header h1 { margin: 0; font-size: 2.2em; color: var(--header-bg); border: none; }
+        .bill-header p { margin: 2px 0; font-size: 1.1em; }
+        .bill-meta { margin-top: 15px; text-align: left; display: flex; justify-content: space-between; }
+        #bill-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        #bill-table th, #bill-table td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        #bill-table th { background-color: #edf2f7; }
+        #bill-table th:first-child, #bill-table td:first-child { width: 40px; text-align: center;}
+        #bill-table th:last-child, #bill-table td:last-child { text-align: right; }
+        #bill-table td:nth-child(5) { font-weight: bold; }
+        .details-input {
+            width: 100%; padding: 6px; border: 1px solid var(--border-color);
+            border-radius: 4px; font-size: 0.95em; box-sizing: border-box; text-align: right;
+        }
+        .delete-btn {
+            background: none; border: none; color: #e53e3e; font-size: 1.5em;
+            cursor: pointer; padding: 0 5px; line-height: 1;
+        }
+        #bill-table tfoot td { font-weight: bold; font-size: 1.2em; text-align: right; }
+        #bill-footer { display: none; margin-top: 40px; text-align: center; font-size: 1em; font-style: italic; }
+
+        /* Print Styles */
+        @media print {
+            body { padding: 0; margin: 0; font-size: 12pt; color: #000; background: #fff; }
+            .item-selector, .bill-preview-container h2, .controls, .edit-controls, .delete-btn, #print-button-container {
+                display: none;
+            }
+            .container, .bill-preview-container { width: 100%; margin: 0; padding: 0; box-shadow: none; }
+            .bill-header { display: block; }
+            #bill-table { width: 100%; }
+            #bill-table th, #bill-table td { border-bottom: 1px solid #ccc; padding: 8px 4px; }
+            #bill-table td:last-child { border-bottom: 1px solid #ccc; } /* Ensure last row has border */
+            .details-input {
+                border: none; background: transparent; width: 100%; font-size: 12pt;
+                font-family: 'Noto Sans Malayalam', sans-serif;
+            }
+            #bill-footer { display: block; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="item-selector" id="item-selector-container">
+            <h1>Master Item & Rate List</h1>
+             <div class="edit-controls">
+                <button onclick="toggleEditMode()" id="edit-mode-btn" class="edit-btn">Edit Master List</button>
+                <button onclick="resetMasterListToDefaults()" class="secondary-btn">Reset to Defaults</button>
+            </div>
+            <div id="item-categories">
+                <!-- Categories will be populated by JavaScript -->
+            </div>
+             <div class="edit-controls">
+                 <button onclick="addNewCategory()" class="add-item-btn" style="width:100%; margin-top: 20px;">+ Add New Category</button>
+            </div>
+        </div>
+
+        <div class="bill-preview-container">
+            <h2>Bill Preview</h2>
+            <div class="bill-info">
+                 <input type="text" id="bill-no-input" placeholder="Bill No." readonly>
+                 <input type="text" id="bill-to-input" placeholder="To (Customer Name)" oninput="saveCurrentBillState()">
+            </div>
+             <div class="controls">
+                <button onclick="resetCurrentBill()" class="secondary-btn">Clear Bill</button>
+            </div>
+            
+            <div id="printable-bill">
+                <div class="bill-header">
+                    <h1>UMMEES KITCHEN</h1>
+                    <p>EVENT, CATERING SERVICE, VILAYIL</p>
+                    <p><strong>SULAIMAN</strong></p>
+                    <p>Ph: 9746612153, 9539454000</p>
+                    <div class="bill-meta">
+                        <p>Bill No: <span id="bill-no-print"></span></p>
+                        <p>Date: <span id="bill-date-print"></span></p>
+                    </div>
+                     <p style="text-align:left; margin-top:10px;">To: <strong id="bill-to-print"></strong></p>
+                </div>
+                <table id="bill-table">
+                    <thead><tr><th>No.</th><th>Item</th><th>Qty</th><th>Rate</th><th>Amount</th><th></th></tr></thead>
+                    <tbody></tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4">Total Amount</td>
+                            <td id="total-amount">0.00</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div id="bill-footer"><p>Thank you for your business!</p></div>
+            </div>
+             <div id="print-button-container" style="margin-top: 20px;">
+                <button class="print-btn" onclick="generateAndPrintBill()">Generate & Print Bill</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        let masterItemData = {};
+        // New structure: { "Category": [{ name: "ItemName", rate: 100 }, ...] }
+        const defaultItemData = {
+            "ഇറച്ചി": [
+                { name: "ചിക്കൻ കറി", rate: 160 }, { name: "ബീഫ് കറി", rate: 180 },
+                { name: "മട്ടൻ കറി", rate: 220 }, { name: "ചിക്കൻ ഫ്രൈ", rate: 170 },
+                { name: "ബീഫ് ഫ്രൈ", rate: 190 }, { name: "ചിക്കൻ ബിരിയാണി", rate: 140 },
+                { name: "ബീഫ് ബിരിയാണി", rate: 160 }, { name: "മട്ടൻ ബിരിയാണി", rate: 200 }
+            ],
+            "മീൻ": [
+                { name: "മീൻ കറി", rate: 120 }, { name: "മീൻ ഫ്രൈ", rate: 100 },
+                { name: "ചെമ്മീൻ റോസ്റ്റ്", rate: 250 }, { name: "കൂന്തൽ ഫ്രൈ", rate: 200 }
+            ],
+            "പച്ചക്കറി": [
+                { name: "പരിപ്പ് കറി", rate: 60 }, { name: "സാമ്പാർ", rate: 70 },
+                { name: "അവിയൽ", rate: 80 }, { name: "തോരൻ", rate: 50 }
+            ],
+            "അരി ആഹാരം": [
+                { name: "ചോറ്", rate: 40 }, { name: "നെയ്ച്ചോറ്", rate: 70 },
+                { name: "പൊറോട്ട", rate: 12 }, { name: "ചപ്പാത്തി", rate: 10 },
+                { name: "അപ്പം", rate: 10 }, { name: "ഇടിയപ്പം", rate: 10 }
+            ],
+            "മറ്റുള്ളവ": [
+                { name: "സാലഡ്", rate: 30 }, { name: "പപ്പടം", rate: 5 },
+                { name: "അച്ചാർ", rate: 10 }, { name: "തൈര്", rate: 20 }
+            ]
+        };
+        const MASTER_LIST_KEY = 'ummeesBillingMasterData';
+        const CURRENT_BILL_ITEMS_KEY = 'ummeesCurrentBillItems';
+        const CURRENT_BILL_TO_KEY = 'ummeesCurrentBillTo';
+        const BILL_COUNTER_KEY = 'ummeesBillCounter';
+
+        // --- MASTER LIST MANAGEMENT (LEFT SIDE) ---
+
+        function initializeMasterList() {
+            const savedData = localStorage.getItem(MASTER_LIST_KEY);
+            if (savedData) {
+                masterItemData = JSON.parse(savedData);
+            } else {
+                masterItemData = JSON.parse(JSON.stringify(defaultItemData)); // Deep copy
+                saveMasterList();
+            }
+            renderMasterList();
+        }
+
+        function saveMasterList() {
+            localStorage.setItem(MASTER_LIST_KEY, JSON.stringify(masterItemData));
+        }
+
+        function renderMasterList() {
+            const container = document.getElementById('item-categories');
+            container.innerHTML = '';
+            
+            for (const category in masterItemData) {
+                const fieldset = document.createElement('fieldset');
+                fieldset.className = 'category-group';
+                
+                const legend = document.createElement('legend');
+                legend.textContent = category;
+                
+                const catHeader = document.createElement('div');
+                catHeader.className = 'category-header';
+                catHeader.appendChild(legend);
+
+                const catControls = document.createElement('div');
+                catControls.innerHTML = `
+                    <span class="edit-icon" onclick="editCategory('${category}')">rename</span>
+                    <span class="edit-icon" onclick="deleteCategory('${category}')" style="color:var(--danger-color);">delete</span>`;
+                catHeader.appendChild(catControls);
+                fieldset.appendChild(catHeader);
+
+                const ul = document.createElement('ul');
+                ul.className = 'item-list';
+
+                masterItemData[category].forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.onclick = () => addItemToBill(item);
+                    li.innerHTML = `
+                        <label>${item.name}</label>
+                        <span class="item-rate">₹${item.rate}</span>
+                        <span class="edit-icon" onclick="event.stopPropagation(); editItem('${category}', ${index})">edit</span>
+                        <span class="edit-icon" onclick="event.stopPropagation(); deleteItem('${category}', ${index})" style="color:var(--danger-color);">×</span>`;
+                    ul.appendChild(li);
+                });
+
+                fieldset.appendChild(ul);
+                const addItemBtn = document.createElement('button');
+                addItemBtn.className = 'add-item-btn secondary-btn';
+                addItemBtn.textContent = '+ Add Item';
+                addItemBtn.onclick = () => addNewItem(category);
+                fieldset.appendChild(addItemBtn);
+
+                container.appendChild(fieldset);
+            }
+        }
+        
+        function toggleEditMode() {
+            const container = document.getElementById('item-selector-container');
+            const btn = document.getElementById('edit-mode-btn');
+            container.classList.toggle('edit-mode-active');
+            if (container.classList.contains('edit-mode-active')) {
+                btn.textContent = 'Done Editing';
+                btn.style.backgroundColor = '#5cb85c';
+            } else {
+                btn.textContent = 'Edit Master List';
+                btn.style.backgroundColor = '#f0ad4e';
+            }
+            renderMasterList();
+        }
+
+        function addNewCategory() {
+            const name = prompt("Enter new category name:");
+            if (name && name.trim()) {
+                if (masterItemData[name.trim()]) { alert("This category already exists."); return; }
+                masterItemData[name.trim()] = [];
+                saveMasterList(); renderMasterList();
+            }
+        }
+
+        function editCategory(oldName) {
+            const newName = prompt(`Rename category "${oldName}" to:`, oldName);
+            if (newName && newName.trim() && newName.trim() !== oldName) {
+                if (masterItemData[newName.trim()]) { alert("A category with this name already exists."); return; }
+                const data = masterItemData[oldName];
+                delete masterItemData[oldName];
+                masterItemData[newName.trim()] = data;
+                saveMasterList(); renderMasterList();
+            }
+        }
+
+        function deleteCategory(category) {
+            if (confirm(`Are you sure you want to permanently delete the category "${category}" and all its items?`)) {
+                delete masterItemData[category];
+                saveMasterList(); renderMasterList();
+            }
+        }
+        
+        function addNewItem(category) {
+            const name = prompt(`Enter new item name for "${category}":`);
+            if (!name || !name.trim()) return;
+            const rate = parseFloat(prompt(`Enter rate for "${name.trim()}":`));
+            if (isNaN(rate)) { alert("Invalid rate. Please enter a number."); return; }
+            masterItemData[category].push({ name: name.trim(), rate: rate });
+            saveMasterList(); renderMasterList();
+        }
+
+        function editItem(category, index) {
+            const oldItem = masterItemData[category][index];
+            const newName = prompt(`Edit item name:`, oldItem.name);
+            if (!newName || !newName.trim()) return;
+            const newRate = parseFloat(prompt(`Edit rate for "${newName.trim()}":`, oldItem.rate));
+            if (isNaN(newRate)) { alert("Invalid rate. Please enter a number."); return; }
+            masterItemData[category][index] = { name: newName.trim(), rate: newRate };
+            saveMasterList(); renderMasterList();
+        }
+
+        function deleteItem(category, index) {
+            const itemName = masterItemData[category][index].name;
+            if (confirm(`Are you sure you want to delete "${itemName}" from the master list?`)) {
+                masterItemData[category].splice(index, 1);
+                saveMasterList(); renderMasterList();
+            }
+        }
+        
+        function resetMasterListToDefaults() {
+             if (confirm('Are you sure you want to reset the master list? All your custom items and rates will be lost.')) {
+                localStorage.removeItem(MASTER_LIST_KEY);
+                initializeMasterList();
+            }
+        }
+
+        // --- BILL MANAGEMENT (RIGHT SIDE) ---
+
+        function addItemToBill(item, qty = 1) {
+            const tbody = document.getElementById('bill-table').getElementsByTagName('tbody')[0];
+            const newRow = tbody.insertRow();
+            
+            newRow.innerHTML = `
+                <td class="row-number"></td>
+                <td>${item.name}</td>
+                <td><input type="number" class="details-input qty-input" value="${qty}" min="1" oninput="updateRowAmount(this.closest('tr'))"></td>
+                <td><input type="number" class="details-input rate-input" value="${item.rate}" min="0" oninput="updateRowAmount(this.closest('tr'))"></td>
+                <td class="amount-cell"></td>
+                <td><button class="delete-btn" onclick="deleteBillItem(this)">×</button></td>
+            `;
+            updateRowAmount(newRow); // Initial calculation
+            updateRowNumbers();
+            saveCurrentBillState();
+        }
+        
+        function updateRowAmount(row) {
+            const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+            const rate = parseFloat(row.querySelector('.rate-input').value) || 0;
+            const amount = qty * rate;
+            row.querySelector('.amount-cell').textContent = amount.toFixed(2);
+            updateTotalAmount();
+            saveCurrentBillState();
+        }
+
+        function updateTotalAmount() {
+            const allAmounts = document.querySelectorAll('#bill-table .amount-cell');
+            const total = Array.from(allAmounts).reduce((sum, cell) => sum + parseFloat(cell.textContent || 0), 0);
+            document.getElementById('total-amount').textContent = total.toFixed(2);
+        }
+
+        function deleteBillItem(button) {
+            button.closest('tr').remove();
+            updateRowNumbers();
+            updateTotalAmount();
+            saveCurrentBillState();
+        }
+
+        function updateRowNumbers() {
+            const rows = document.querySelectorAll('#bill-table tbody tr');
+            rows.forEach((row, index) => {
+                row.querySelector('.row-number').textContent = index + 1;
+            });
+        }
+        
+        function saveCurrentBillState() {
+            const billRows = document.querySelectorAll('#bill-table tbody tr');
+            const billData = Array.from(billRows).map(row => ({
+                name: row.cells[1].textContent,
+                qty: row.querySelector('.qty-input').value,
+                rate: row.querySelector('.rate-input').value
+            }));
+            localStorage.setItem(CURRENT_BILL_ITEMS_KEY, JSON.stringify(billData));
+            localStorage.setItem(CURRENT_BILL_TO_KEY, document.getElementById('bill-to-input').value);
+        }
+
+        function loadCurrentBillState() {
+            const billData = JSON.parse(localStorage.getItem(CURRENT_BILL_ITEMS_KEY));
+            if (billData) {
+                billData.forEach(item => addItemToBill({ name: item.name, rate: item.rate }, item.qty));
+            }
+            const billTo = localStorage.getItem(CURRENT_BILL_TO_KEY);
+            if (billTo) {
+                document.getElementById('bill-to-input').value = billTo;
+            }
+        }
+
+        function resetCurrentBill() {
+             if (confirm('Are you sure you want to clear the current bill?')) {
+                document.getElementById('bill-table').getElementsByTagName('tbody')[0].innerHTML = '';
+                document.getElementById('bill-to-input').value = '';
+                localStorage.removeItem(CURRENT_BILL_ITEMS_KEY);
+                localStorage.removeItem(CURRENT_BILL_TO_KEY);
+                updateTotalAmount();
+            }
+        }
+        
+        // --- BILLING & PRINTING ---
+        function initializeBillCounter() {
+            let billCounter = parseInt(localStorage.getItem(BILL_COUNTER_KEY) || '0');
+            document.getElementById('bill-no-input').value = `UKB-${billCounter + 1}`;
+        }
+        
+        function generateAndPrintBill() {
+            const billBody = document.getElementById('bill-table').getElementsByTagName('tbody')[0];
+            if(billBody.rows.length === 0) {
+                alert("Cannot generate an empty bill. Please add items.");
+                return;
+            }
+
+            let currentBillNo = parseInt(localStorage.getItem(BILL_COUNTER_KEY) || '0') + 1;
+            
+            // Prepare printable header
+            document.getElementById('bill-no-print').textContent = `UKB-${currentBillNo}`;
+            document.getElementById('bill-date-print').textContent = new Date().toLocaleDateString('en-GB');
+            document.getElementById('bill-to-print').textContent = document.getElementById('bill-to-input').value || 'N/A';
+            
+            window.print();
+
+            // After printing is initiated, update the counter and clear the bill
+            localStorage.setItem(BILL_COUNTER_KEY, currentBillNo);
+            resetCurrentBill();
+            initializeBillCounter();
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = () => {
+            initializeMasterList();
+            loadCurrentBillState();
+            initializeBillCounter();
+        };
+    </script>
+</body>
+</html>
